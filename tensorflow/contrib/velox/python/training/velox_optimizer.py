@@ -7,16 +7,43 @@ from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import state_ops
 
-class ModelAverageOptimizer(tf.train.Optimizer):
+"""
+  def __init__(self,
+               initial_value=None,
+               trainable=True,
+               validate_shape=True,
+               caching_device=None,
+               name=None,
+               variable_def=None,
+               dtype=None,
+               import_scope=None,
+               constraint=None,
+               synchronization=VariableSynchronization.AUTO,
+               aggregation=VariableAggregation.NONE):
+"""
+
+class SSIBAL(object):
+  def __init__(self, trainable_vars):
+    self._ltor = {}
+    for lvar in trainable_vars:
+      rvar = tf.Variable(lvar, trainable=False)
+      self._ltor[lvar] = rvar
+    self.
+
+  def 
+
+
+class VeloxOptimizer(tf.train.Optimizer):
   def __init__(self,
                opt,
                communication_period=10,
                use_locking=True,
-               name='ModelAverageOptimizer'):
-    super(ModelAverageOptimizer, self).__init__(use_locking, name)
+               name='VeloxOptimizer'):
+    super(VeloxOptimizer, self).__init__(use_locking, name)
     self._opt = opt
     self._period = communication_period
     self._push = dddl_push
+    self._global_map = {}
 
   def apply_gradients(self, grads_and_vars, global_step=None, name=None):
 
