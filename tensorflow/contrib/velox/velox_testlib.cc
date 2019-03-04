@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow/core/distributed_runtime/rpc/grpc_testlib.h"
+#include "tensorflow/contrib/velox/velox_testlib.h"
 
 #include "tensorflow/core/distributed_runtime/rpc/grpc_session.h"
 #include "tensorflow/core/lib/strings/str_util.h"

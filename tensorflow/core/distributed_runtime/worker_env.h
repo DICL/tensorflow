@@ -64,6 +64,8 @@ struct WorkerEnv {
 
   // A pool of threads for scheduling compute work.
   thread::ThreadPool* compute_pool = nullptr;
+
+  // 
 };
 
 }  // end namespace tensorflow

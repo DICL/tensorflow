@@ -29,7 +29,7 @@ class VeloxServer : public GrpcServer {
   Status ChannelCacheFactory(const ServerDef& server_def,
                              GrpcChannelCache** channel_cache);
  private:
-  RdmaMgr* rdma_mgr_;
+  RdmaMgr* rdma_mgr_;  // 
   //std::vector<std::pair<string, Tensor>> params_;
   std::vector<Tensor> params_;
   mutex mu_;

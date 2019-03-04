@@ -134,6 +134,27 @@ tf_cc_binary(
     ],
 )
 
+tf_cuda_library(
+    name = "velox_testlib",
+    testonly = 1,
+    srcs = ["velox_testlib.cc"],
+    hdrs = ["velox_testlib.h"],
+    data = [
+        ":velox_testlib_server",
+    ],
+    visibility = ["//tensorflow:__subpackages__"],
+    deps = [
+        "//tensorflow/core/distributed_runtime/rpc:grpc_session",
+        "//tensorflow/core:core_cpu",
+        "//tensorflow/core:framework",
+        "//tensorflow/core:lib",
+        "//tensorflow/core:protos_all_cc",
+        "//tensorflow/core:test",
+        "//tensorflow/core:testlib",
+    ],
+    alwayslink = 1,
+)
+
 
 #filegroup(
 #    name = "c_srcs",
