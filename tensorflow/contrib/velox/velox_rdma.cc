@@ -175,7 +175,10 @@ LocalMRTable* create_local_mr_table(
 }
 
 
-class RdmaTensorPush;
+class RdmaTensorPush {
+
+
+};
 
 
 }  // namespace tensorflow

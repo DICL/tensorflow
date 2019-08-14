@@ -73,6 +73,9 @@ struct TensorKey {
 };
 static Status parse_key(StringPiece key, ParsedKey* out);
 
+class RdmaTensorPush {
+};
+
 class RdmaMessageBuffer;
 // Class that represents the Rdma Adapter.
 // Responsible for creation of the completion queue, and handling
