@@ -90,5 +90,6 @@ TENSORFLOW_API_INIT_FILES = [
     "test/__init__.py",
     "train/__init__.py",
     "user_ops/__init__.py",
+    "ptre/__init__.py",
     # END GENERATED FILES
 ]

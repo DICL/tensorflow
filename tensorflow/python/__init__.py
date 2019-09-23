@@ -66,6 +66,9 @@ from tensorflow.core.protobuf.config_pb2 import *
 from tensorflow.core.protobuf.tensorflow_server_pb2 import *
 from tensorflow.core.util.event_pb2 import *
 
+# PTRE
+from tensorflow.python.ptre import ptre
+
 # Framework
 from tensorflow.python.framework.framework_lib import *  # pylint: disable=redefined-builtin
 from tensorflow.python.framework.versions import *
@@ -109,7 +112,6 @@ from tensorflow.python.ops import gen_boosted_trees_ops as _gen_boosted_trees_op
 
 # Import cudnn rnn ops to make sure their ops are registered.
 from tensorflow.python.ops import gen_cudnn_rnn_ops as _
-
 
 # Import the names from python/training.py as train.Name.
 from tensorflow.python.training import training as train

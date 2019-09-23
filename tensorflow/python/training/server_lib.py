@@ -25,7 +25,6 @@ from tensorflow.python.framework import errors
 from tensorflow.python.util import compat
 from tensorflow.python.util.tf_export import tf_export
 
-
 def _make_server_def(server_or_cluster_def, job_name, task_index, protocol,
                      config):
   """Creates a `tf.train.ServerDef` protocol buffer.

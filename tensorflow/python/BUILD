@@ -81,6 +81,7 @@ py_library(
         "//tensorflow/tools/api/tests:__pkg__",
     ],
     deps = [
+				":ptre",
         ":array_ops",
         ":bitwise_ops",
         ":boosted_trees_ops",
@@ -3302,6 +3303,19 @@ cuda_py_test(
 )
 
 py_library(
+		name = "ptre",
+		srcs = [
+				"ptre/ptre.py",
+				"ptre/server_lib.py",
+		],
+		srcs_version = "PY2AND3",
+		deps = [
+        ":util",
+        ":pywrap_tensorflow",
+		],
+)
+
+py_library(
     name = "training",
     srcs = glob(
         ["training/**/*.py"],
@@ -3866,6 +3880,7 @@ tf_py_wrap_cc(
     name = "pywrap_tensorflow_internal",
     srcs = ["tensorflow.i"],
     swig_includes = [
+        "ptre/ptre.i",
         "client/device_lib.i",
         "client/events_writer.i",
         "client/tf_session.i",
@@ -3904,6 +3919,9 @@ tf_py_wrap_cc(
         "//conditions:default": None,
     }),
     deps = [
+        "//tensorflow/ptre:ptre_server_lib",
+        #"//tensorflow/ptre:grpc_ptre_server",
+        #"//tensorflow/ptre:grpc_ptre_service",
         ":bfloat16_lib",
         ":cost_analyzer_lib",
         ":model_analyzer_lib",
