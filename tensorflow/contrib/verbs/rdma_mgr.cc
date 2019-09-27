@@ -279,7 +279,8 @@ void RdmaMgr::InitAllocators() {
 #if GOOGLE_CUDA
   if (IsGDRAvailable()) {
     // Note we don't free allocated GPU memory so there is no free visitor
-    int32_t bus_id = TryToReadNumaNode(rdma_adapter_->context_->device) + 1;
+    // int32_t bus_id = TryToReadNumaNode(rdma_adapter_->context_->device) + 1;
+    int32_t bus_id = 0;
 
     SubAllocator::Visitor cuda_alloc_visitor = [](void* ptr, int gpu_id,
                                                   size_t num_bytes) {
