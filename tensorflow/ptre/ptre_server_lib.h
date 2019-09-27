@@ -5,7 +5,9 @@
 //#include "tensorflow/core/platform/env.h"
 #include "tensorflow/ptre/rdma_mgr.h"
 #include "tensorflow/ptre/grpc_ptre_server.h"
-//#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
+#include "tensorflow/ptre/ptre_util.h"
+#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
+#include "tensorflow/core/distributed_runtime/rpc/grpc_channel.h"
 
 #include <string>
 #include <memory>
@@ -24,9 +26,10 @@ class PtreServiceImpl;
 
 class PtreServer {
  public:
-  static void Create(const int& rank,
+  static void Create(const ServerDef& server_def,
+                     const int& rank,
                      std::unique_ptr<PtreServer>* out_server);
-  PtreServer(const int& rank);
+  PtreServer(const ServerDef& server_def, const int& rank);
   // Destruction is only supported in the factory method. Clean
   // shutdown is not currently implemented for this server type.
   ~PtreServer();
@@ -43,18 +46,28 @@ class PtreServer {
   //void set_rank();
   int get_rank();
 
- private:
-  typedef std::unordered_map<string, ::grpc::Channel*> GrpcChannelTable;
+ protected:
+  Status ChannelCacheFactory(const ServerDef& server_def,
+                             GrpcChannelCache** channel_cache);
+  ChannelCreationFunction GetChannelCreationFunction() const;
 
-  //static void RunGrpcServer(const string& worker);
-  void GrpcChannelTableFactory(GrpcChannelTable &channel_table);
+  // Parses a WorkerCacheFactoryOptions into a GrpcChannelSpec.
+  Status ParseChannelSpec(const WorkerCacheFactoryOptions& options,
+                          GrpcChannelSpec* channel_spec);
+
+ private:
+
+  //void GrpcChannelTableFactory(GrpcChannelTable &channel_table);
 
   int rank_;
+  int bound_port_ = 50051;
   string local_worker_;
+  ServerDef server_def_;
   RdmaMgr* rdma_mgr_;
   //std::unique_ptr<Thread> ptre_thread_ GUARDED_BY(mu_);
   PtreServiceImpl* ptre_service_ = nullptr;
-  GrpcChannelTable grpc_channel_table_;
+  //GrpcChannelTable* grpc_channel_table_ = nullptr;
+  GrpcChannelCache* grpc_channel_cache_ = nullptr;
   // Guards state transitions.
   mutex mu_;
   

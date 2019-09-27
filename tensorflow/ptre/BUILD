@@ -28,7 +28,7 @@ cc_library(
     srcs = ["grpc_ptre_server.cc"],
     hdrs = [
       "grpc_ptre_server.h",
-		  "ptre_util.h",
+      "ptre_util.h",
     ],
     deps = [
         ":rdma_mgr",
@@ -74,34 +74,55 @@ cc_library(
 cc_library(
     name = "ptre_server_lib",
     srcs = ["ptre_server_lib.cc"],
-    hdrs = ["ptre_server_lib.h"],
+    hdrs = [
+        "ptre_server_lib.h",
+        "ptre_util.h"
+    ],
     linkstatic = 1,
     deps = [
-				":rdma_mgr",
+        ":rdma_mgr",
         ":grpc_ptre_server",
         ":grpc_ptre_service",
         ":ptre_service_proto_cc",
         #"//tensorflow/core:lib",
         #"//tensorflow/core/distributed_runtime:server_lib",
-        #"//tensorflow/core/distributed_runtime/rpc:grpc_server_lib",
+        "//tensorflow/core/distributed_runtime/rpc:grpc_channel",
+        "//tensorflow/core/distributed_runtime/rpc:grpc_server_lib",
     ],
+)
+
+cc_library(
+    name = "grpc_ptre_client",
+    srcs = ["grpc_ptre_client.cc"],
+    hdrs = ["grpc_ptre_client.h"],
+    deps = [
+        ":grpc_ptre_service",
+        ":ptre_service_proto_cc",
+        "//tensorflow/core:lib",
+        "//tensorflow/core/distributed_runtime:call_options",
+        "//tensorflow/core/distributed_runtime/rpc:grpc_util",
+    ],
+    alwayslink = 1,
 )
 
 tf_cuda_library(
     name = "rdma_mgr",
     srcs = ["rdma_mgr.cc"],
     hdrs = [
-			"rdma_mgr.h",
-			"ptre_util.h",
-		],
+      "rdma_mgr.h",
+      "ptre_util.h",
+    ],
     deps = [
-        ":ptre_service_proto_cc",
         ":rdma",
+        ":ptre_service_proto_cc",
+        ":grpc_ptre_client",
         "//tensorflow/core:core_cpu_internal",
         "//tensorflow/core:lib",
         "//tensorflow/core:lib_internal",
-				"//tensorflow/core:stream_executor",
+        "//tensorflow/core:stream_executor",
         "//tensorflow/core:gpu_runtime",
+        "//tensorflow/core/distributed_runtime/rpc:grpc_channel",
+        "//tensorflow/core/distributed_runtime/rpc:grpc_util",
     ],
 )
 

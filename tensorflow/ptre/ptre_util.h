@@ -6,6 +6,8 @@
 #include <vector>
 #include <iomanip>
 
+#include "grpcpp/grpcpp.h"
+
 namespace tensorflow {
 
 class PtreUtil {
@@ -28,6 +30,7 @@ class PtreUtil {
 
 };
 
+typedef std::unordered_map<string, ::grpc::Channel*> GrpcChannelTable;
 
 }
 

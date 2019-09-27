@@ -15,7 +15,9 @@
 
 namespace tensorflow {
 
-RdmaMgr::RdmaMgr(const string& worker) : local_worker_(worker) {
+RdmaMgr::RdmaMgr(const string& worker,
+                 GrpcChannelCache* const grpc_channel_cache)
+    : local_worker_(worker), grpc_channel_cache_(grpc_channel_cache) {
   // hardcoded to default session (legacy_session_)
   // TODO: use WorkerSessionForSession
   // need to pass in session handle
@@ -29,7 +31,7 @@ RdmaMgr::RdmaMgr(const string& worker) : local_worker_(worker) {
       &workers);
   */
   num_remote_workers_ = workers.size() - 1;
-  VLOG(2) << "rmda_mgr on local worker: " << local_worker_;
+  LOG(INFO) << "rmda_mgr on local worker: " << local_worker_;
   for (size_t i = 0; i < workers.size(); i++) {
     if (local_worker_.compare(workers[i]) != 0) {
       channel_table_.insert(
@@ -43,25 +45,24 @@ RdmaMgr::RdmaMgr(const string& worker) : local_worker_(worker) {
 // This is done at the beginning of the server setup.
 
 void RdmaMgr::SetupChannels() {
+  // Set up rdma channels
+  //
+  // For each rdma channel,
+  // 1. get the grpc channel
+  // 2. init a grpc client
+  // 3. set up request
+  // 4. client->GetRemoteAddress
   for (const auto& p : channel_table_) {
     string worker_name = p.first;
-    RDMA_LOG(2) << "Connecting to remote node " << worker_name;
+    LOG(INFO) << "Connecting to remote node " << worker_name;
     RdmaChannel* rc = p.second;
     GetRemoteAddressRequest req;
     GetRemoteAddressResponse resp;
-  }
-  /*
-  for (const auto& p : channel_table_) {
-    string worker_name = p.first;
-    RDMA_LOG(2) << "Connecting to remote node " << worker_name;
-    RdmaChannel* rc = p.second;
-    //GetRemoteAddressRequest req;
-    //GetRemoteAddressResponse resp;
-    // get the channel cache
+    // get the grpc channel
+    // init a grpc client
     SharedGrpcChannelPtr client_channel =
-        channel_cache_->FindWorkerChannel(worker_name);
-    GrpcVerbsClient* client = new GrpcVerbsClient(client_channel);
-    CHECK(client != nullptr) << "No worker known as " << worker_name;
+        grpc_channel_cache_->FindWorkerChannel(worker_name);
+    GrpcPtreClient* client = new GrpcPtreClient(client_channel);
 
     // setting up request
     req.set_host_name(local_worker_);
@@ -117,13 +118,12 @@ void RdmaMgr::SetupChannels() {
         if (++attempts == max_num_attempts) {
           break;
         }
-        worker_env_->env->SleepForMicroseconds(2000000);
+        Env::Default()->SleepForMicroseconds(2000000);
       }
     } while (!s.ok());
-    RDMA_LOG(0) << "Connected to remote node " << worker_name;
+    LOG(INFO) << "Connected to remote node " << worker_name;
     delete client;
   }
-  */
 }
 
 // Check connectivity by pinging every channel
@@ -222,7 +222,7 @@ int TryToReadNumaNode(ibv_device* device) {
   // Windows support for NUMA is not currently implemented. Return node 0.
   return 0;
 #else
-  VLOG(2) << "Trying to read NUMA node for device: " << device->name;
+  LOG(INFO) << "Trying to read NUMA node for device: " << device->name;
   static const int kUnknownNumaNode = -1;
 
   auto filename = string(device->ibdev_path) + "/device/numa_node";

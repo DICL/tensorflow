@@ -3,8 +3,9 @@
 namespace tensorflow {
 
 PtreServiceImpl::PtreServiceImpl(const string& worker,
-                                 ::grpc::ServerBuilder* builder)
-    : local_worker_(worker) {
+                                 ::grpc::ServerBuilder* builder,
+                                 RdmaMgr* rdma_mgr)
+    : local_worker_(worker), rdma_mgr_(rdma_mgr) {
   //rdma_mgr_ = new RdmaMgr(local_worker_);
   cq_ = builder->AddCompletionQueue().release();
 }
@@ -15,7 +16,6 @@ PtreServiceImpl::~PtreServiceImpl() {
     is_shutdown_ = true;
   }
   delete cq_;
-  //delete rdma_mgr_;
 }
 
 //void PtreServiceImpl::GetRemoteAddress(::grpc::ServerContext* context,

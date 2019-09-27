@@ -14,7 +14,8 @@ namespace tensorflow {
 class PtreServiceImpl : public grpc::PtreService::AsyncService {
  public:
   PtreServiceImpl(const string& worker,
-                  ::grpc::ServerBuilder* builder);
+                  ::grpc::ServerBuilder* builder,
+                  RdmaMgr* rdma_mgr);
   ~PtreServiceImpl();
   void HandleRPCsLoop();
   //::grpc::Status GetRemoteAddress(::grpc::ServerContext* context,
