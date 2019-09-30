@@ -160,6 +160,7 @@ py_library(
         ":util",
         ":weights_broadcast_ops",
         ":while_v2",
+        ":ptre",
         "//tensorflow/core:protos_all_py",
         "//tensorflow/lite/python:lite",
         "//tensorflow/python/compat",
@@ -2350,6 +2351,19 @@ py_library(
         ":training",
         "//tensorflow/core/kernels/boosted_trees:boosted_trees_proto_py",
     ],
+)
+
+py_library(
+		name = "ptre",
+		srcs = [
+				"ptre/ptre.py",
+				"ptre/server_lib.py",
+		],
+		srcs_version = "PY2AND3",
+		deps = [
+        ":util",
+        ":pywrap_tensorflow",
+		],
 )
 
 py_library(
@@ -4856,6 +4870,7 @@ tf_py_wrap_cc(
     name = "pywrap_tensorflow_internal",
     srcs = ["tensorflow.i"],
     swig_includes = [
+        "ptre/ptre.i",
         "client/device_lib.i",
         "client/events_writer.i",
         "client/tf_session.i",
@@ -4909,6 +4924,7 @@ tf_py_wrap_cc(
         ":py_record_writer_lib",
         ":python_op_gen",
         ":tf_session_helper",
+        "//tensorflow/ptre:ptre_server_lib",
         "//third_party/python_runtime:headers",
         "//tensorflow/c:c_api",
         "//tensorflow/c:c_api_experimental",
