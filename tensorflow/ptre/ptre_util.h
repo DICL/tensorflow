@@ -13,14 +13,14 @@ namespace tensorflow {
 class PtreUtil {
  public:
   static void ListWorkers(std::vector<string>& workers) {
-    workers.emplace_back("dumbo001");
-    workers.emplace_back("dumbo002");
+    workers.emplace_back("ib001");
+    workers.emplace_back("ib002");
   }
 
   static std::string GetWorkerNameByRank(const int rank) {
     std::stringstream suffix;
     suffix << std::setw(3) << std::setfill('0') << rank;
-    std::string worker("dumbo" + suffix.str());
+    std::string worker("ib" + suffix.str());
     return worker;
   }
 
