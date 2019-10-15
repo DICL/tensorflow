@@ -137,6 +137,7 @@ py_library(
         ":ops",
         ":platform",
         ":proto_ops",
+        ":ptre",
         ":pywrap_tensorflow",
         ":rnn_ops_gen",
         ":saver_test_utils",
@@ -4289,6 +4290,12 @@ cuda_py_test(
     ],
     tags = ["no_windows_gpu"],
     xla_enable_strict_auto_jit = True,
+)
+
+py_library(
+    name = "ptre",
+    srcs = ["ptre/ptre.py"],
+    srcs_version = "PY2AND3",
 )
 
 py_library(

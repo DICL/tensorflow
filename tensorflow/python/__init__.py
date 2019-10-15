@@ -119,6 +119,9 @@ from tensorflow.python.ops import gen_rnn_ops as _
 # Import the names from python/training.py as train.Name.
 from tensorflow.python.training import training as train
 
+# Import PTRE
+from tensorflow.python.ptre import ptre
+
 # Sub-package for performing i/o directly instead of via ops in a graph.
 from tensorflow.python.lib.io import python_io
 

@@ -53,6 +53,7 @@ TENSORFLOW_API_INIT_FILES_V1 = [
     "nn/__init__.py",
     "nn/rnn_cell/__init__.py",
     "profiler/__init__.py",
+    "ptre/__init__.py",
     "python_io/__init__.py",
     "quantization/__init__.py",
     "ragged/__init__.py",

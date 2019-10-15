@@ -2545,6 +2545,10 @@ void TF_DeleteServer(TF_Server* server) {
 #endif  // !defined(IS_MOBILE_PLATFORM) && !defined(IS_SLIM_BUILD)
 }
 
+void PTRE_Init() {
+  LOG(INFO) << "PTRE_Init()" << std::endl;
+}
+
 void TF_RegisterLogListener(void (*listener)(const char*)) {
 #if !defined(IS_MOBILE_PLATFORM) && !defined(IS_SLIM_BUILD)
   tensorflow::logging::RegisterListener(listener);

@@ -1547,6 +1547,9 @@ TF_CAPI_EXPORT extern const char* TF_ServerTarget(TF_Server* server);
 // it will be stopped and joined.
 TF_CAPI_EXPORT extern void TF_DeleteServer(TF_Server* server);
 
+// PTRE
+TF_CAPI_EXPORT extern void PTRE_Init();
+
 // Register a listener method that processes printed messages.
 //
 // If any listeners are registered, the print operator will call all listeners
