@@ -44,11 +44,13 @@ limitations under the License.
 #include "tensorflow/core/platform/mutex.h"
 #include "tensorflow/core/platform/types.h"
 #include "tensorflow/core/public/session.h"
+#include "tensorflow/ptre/core/ptre_server.h"
 
 namespace tensorflow {
 class Device;
 class DeviceMgr;
 class ServerInterface;
+class PtreServer;
 }  // namespace tensorflow
 
 // Internal structures used by the C API. These are likely to change and should
@@ -181,6 +183,12 @@ struct TF_Server {
 
   const tensorflow::string target;
   std::unique_ptr<tensorflow::ServerInterface> server;
+};
+struct PTRE_Server {
+  PTRE_Server(std::unique_ptr<tensorflow::PtreServer> server);
+
+  const tensorflow::string target;
+  std::unique_ptr<tensorflow::PtreServer> server;
 };
 #endif  // !defined(IS_MOBILE_PLATFORM) && !defined(IS_SLIM_BUILD)
 

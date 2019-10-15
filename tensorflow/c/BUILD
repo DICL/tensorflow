@@ -80,6 +80,7 @@ tf_cuda_library(
     }) + [
         ":tf_status_internal",
         ":tf_tensor_internal",
+        "//tensorflow/ptre:ptre_server",
     ],
 )
 

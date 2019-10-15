@@ -2549,6 +2549,17 @@ void PTRE_Init() {
   LOG(INFO) << "PTRE_Init()" << std::endl;
 }
 
+bool PTRE_CheckIncoming() {
+  LOG(INFO) << "PTRE_CheckIncoming()" << std::endl;
+  return true;
+}
+
+PTRE_Server* PTRE_NewServer(int rank) {
+  std::unique_ptr<tensorflow::PtreServer> out_server;
+  tensorflow::NewPtreServer(rank, &out_server);
+  return new PTRE_Server(std::move(out_server));
+}
+
 void TF_RegisterLogListener(void (*listener)(const char*)) {
 #if !defined(IS_MOBILE_PLATFORM) && !defined(IS_SLIM_BUILD)
   tensorflow::logging::RegisterListener(listener);

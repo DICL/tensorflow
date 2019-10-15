@@ -1548,7 +1548,10 @@ TF_CAPI_EXPORT extern const char* TF_ServerTarget(TF_Server* server);
 TF_CAPI_EXPORT extern void TF_DeleteServer(TF_Server* server);
 
 // PTRE
+typedef struct PTRE_Server PTRE_Server;
 TF_CAPI_EXPORT extern void PTRE_Init();
+TF_CAPI_EXPORT extern bool PTRE_CheckIncoming();
+TF_CAPI_EXPORT extern PTRE_Server* PTRE_NewServer(int rank);
 
 // Register a listener method that processes printed messages.
 //
