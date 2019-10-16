@@ -27,3 +27,26 @@ cc_library(
         ":ptre_service",
     ],
 )
+
+cc_library(
+    name = "ptre_server",
+    srcs = ["core/ptre_server.cc"],
+    hdrs = ["core/ptre_server.h"],
+    deps = [
+        ":ptre_service_impl",
+        "//tensorflow/core:framework",
+    ]
+)
+
+# Consensus Manager
+
+cc_library(
+    name = "remote_store",
+    srcs = ["cm/remote_store.cc"],
+    hdrs = [
+        "cm/remote_store.h",
+    ],
+    deps = [
+        "//tensorflow/core:framework",
+    ],
+)

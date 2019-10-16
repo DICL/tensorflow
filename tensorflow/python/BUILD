@@ -4294,7 +4294,13 @@ cuda_py_test(
 
 py_library(
     name = "ptre",
-    srcs = ["ptre/ptre.py"],
+    srcs = [
+        "ptre/ptre.py",
+        "ptre/optimizer.py",
+        "ptre/cm_ops.py",
+        "ptre/server_lib.py",
+        "ptre/callbacks.py",
+    ],
     srcs_version = "PY2AND3",
 )
 

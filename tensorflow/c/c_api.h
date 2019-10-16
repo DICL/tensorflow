@@ -1550,8 +1550,14 @@ TF_CAPI_EXPORT extern void TF_DeleteServer(TF_Server* server);
 // PTRE
 typedef struct PTRE_Server PTRE_Server;
 TF_CAPI_EXPORT extern void PTRE_Init();
-TF_CAPI_EXPORT extern bool PTRE_CheckIncoming();
 TF_CAPI_EXPORT extern PTRE_Server* PTRE_NewServer(int rank);
+TF_CAPI_EXPORT extern void PTRE_ServerStop(PTRE_Server* server);
+TF_CAPI_EXPORT extern bool PTRE_CheckIncoming(PTRE_Server* server);
+TF_CAPI_EXPORT extern void PTRE_InitTrainableVariables(PTRE_Server* server,
+                                                       const char** var_names,
+                                                       TF_Tensor** vars,
+                                                       int nvars);
+TF_CAPI_EXPORT extern void PTRE_DeleteServer(PTRE_Server* server);
 
 // Register a listener method that processes printed messages.
 //

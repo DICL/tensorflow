@@ -2480,6 +2480,8 @@ TF_Buffer* TF_GetRegisteredKernelsForOp(const char* name, TF_Status* status) {
 #if !defined(IS_MOBILE_PLATFORM) && !defined(IS_SLIM_BUILD)
 TF_Server::TF_Server(std::unique_ptr<tensorflow::ServerInterface> server)
     : target(server->target()), server(std::move(server)) {}
+PTRE_Server::PTRE_Server(std::unique_ptr<tensorflow::PtreServer> server)
+    : target(server->target()),  server(std::move(server)) {}
 #endif  // !defined(IS_MOBILE_PLATFORM) && !defined(IS_SLIM_BUILD)
 
 TF_Server* TF_NewServer(const void* proto, size_t proto_len,
@@ -2549,16 +2551,39 @@ void PTRE_Init() {
   LOG(INFO) << "PTRE_Init()" << std::endl;
 }
 
-bool PTRE_CheckIncoming() {
-  LOG(INFO) << "PTRE_CheckIncoming()" << std::endl;
-  return true;
-}
-
 PTRE_Server* PTRE_NewServer(int rank) {
   std::unique_ptr<tensorflow::PtreServer> out_server;
   tensorflow::NewPtreServer(rank, &out_server);
   return new PTRE_Server(std::move(out_server));
 }
+
+void PTRE_DeleteServer(PTRE_Server* server) {
+  delete server;
+}
+
+void PTRE_ServerStop(PTRE_Server* server) {
+  server->server->Stop();
+}
+
+bool PTRE_CheckIncoming(PTRE_Server* server) {
+  return server->server->CheckIncoming();
+}
+
+void PTRE_InitTrainableVariables(PTRE_Server* server,
+                                 const char** var_names,
+                                 TF_Tensor** vars,
+                                 int nvars) {
+  std::vector<std::string> names;
+  std::vector<tensorflow::DataType> dtypes;
+  std::vector<tensorflow::TensorShape> shapes;
+  for (int i = 0; i < nvars; i++) {
+    names.emplace_back(std::string(var_names[i]));
+    dtypes.emplace_back(static_cast<tensorflow::DataType>(vars[i]->dtype));
+    shapes.emplace_back(vars[i]->shape);
+  }
+  server->server->InitTrainableVariables(names, dtypes, shapes, nvars);
+}
+
 
 void TF_RegisterLogListener(void (*listener)(const char*)) {
 #if !defined(IS_MOBILE_PLATFORM) && !defined(IS_SLIM_BUILD)
