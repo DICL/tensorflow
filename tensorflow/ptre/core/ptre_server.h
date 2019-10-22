@@ -19,8 +19,10 @@ class PtreServer {
 
   bool CheckIncoming();
   void InitTrainableVariables(const std::vector<std::string>& names,
-                              const std::vector<DataType>& dtypes,
-                              const std::vector<TensorShape>& shapes,
+                              const std::vector<Tensor*>& var_tensors,
+                              //TF_Tensor* const* vars,
+                              //const std::vector<DataType>& dtypes,
+                              //const std::vector<TensorShape>& shapes,
                               int nvars);
   //void NewPtreServer(int rank, std::unique_ptr<PtreServer>* out_server);
   const std::string target() const;

@@ -2571,17 +2571,23 @@ bool PTRE_CheckIncoming(PTRE_Server* server) {
 
 void PTRE_InitTrainableVariables(PTRE_Server* server,
                                  const char** var_names,
-                                 TF_Tensor** vars,
+                                 TF_Tensor* const* vars,
                                  int nvars) {
   std::vector<std::string> names;
   std::vector<tensorflow::DataType> dtypes;
   std::vector<tensorflow::TensorShape> shapes;
+  //TODO: Manage memory leak
+  std::vector<Tensor*> var_tensors;
   for (int i = 0; i < nvars; i++) {
     names.emplace_back(std::string(var_names[i]));
     dtypes.emplace_back(static_cast<tensorflow::DataType>(vars[i]->dtype));
     shapes.emplace_back(vars[i]->shape);
+    var_tensors.emplace_back(new Tensor());
+    LOG(INFO) << "Calling TF_TensorToTensor" << std::endl;
+    TF_TensorToTensor(vars[i], var_tensors.back());  // tensorflow/c/tf_tensor.cc
   }
-  server->server->InitTrainableVariables(names, dtypes, shapes, nvars);
+  //server->server->InitTrainableVariables(names, dtypes, shapes, nvars);
+  server->server->InitTrainableVariables(names, var_tensors, nvars);
 }
 
 

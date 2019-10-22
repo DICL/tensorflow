@@ -28,13 +28,43 @@ bool PtreServer::CheckIncoming() {
 }
 
 void PtreServer::InitTrainableVariables(const std::vector<std::string>& names,
-                                        const std::vector<DataType>& dtypes,
-                                        const std::vector<TensorShape>& shapes,
+                                        const std::vector<Tensor*>& var_tensors,
                                         int nvars) {
   LOG(INFO) << "PtreServer got " << nvars << " tensors:" << std::endl;
   for (int i = 0; i < nvars; i++) {
     LOG(INFO) << i << ": " << names[i] << std::endl;
+    LOG(INFO) << var_tensors[i]->dtype() << ", "
+              << var_tensors[i]->shape() << std::endl;
   }
+/*
+void Tensor::CopyFromInternal(const Tensor& other, const TensorShape& shape) {
+  CHECK_EQ(shape.num_elements(), other.NumElements());
+  // Data type will be overwritten if this == &other, since dtype is part of
+  // shape.
+  DataType other_dtype = other.dtype();
+  shape_ = shape;
+  set_dtype(other_dtype);
+  if (buf_ != other.buf_) {
+    UnrefIfNonNull(buf_);
+    buf_ = other.buf_;
+    RefIfNonNull(buf_);
+  }
+}
+*/
+/*
+Tensor::Tensor(Allocator* a, DataType type, const TensorShape& shape)
+    : shape_(shape), buf_(nullptr) {
+  set_dtype(type);
+  CHECK_NOTNULL(a);
+  if (shape_.num_elements() > 0 || a->AllocatesOpaqueHandle()) {
+    CASES(type, buf_ = new Buffer<T>(a, shape.num_elements()));
+  }
+  if (buf_ != nullptr && buf_->data() != nullptr && LogMemory::IsEnabled()) {
+    LogMemory::RecordTensorAllocation("Unknown", LogMemory::UNKNOWN_STEP_ID,
+                                      *this);
+  }
+}
+*/
 }
 
 const std::string PtreServer::target() const {

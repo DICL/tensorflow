@@ -19,8 +19,8 @@ class InitTrainableVariablesCallback(Callback):
     var_names = [compat.as_bytes(v.name) for v in self.model.trainable_variables]
     print(var_names)
     tensors = [Variable._TensorConversionFunction(v) for v in self.model.trainable_variables]
-    nvars = len(self.model.trainable_variables)
+    #nvars = len(self.model.trainable_variables)
     #for var in self.model.trainable_variables:
       #var_names.append(compat.var.name)
       #tensors.append(Variable._TensorConversionFunction(var))
-    c_api.PTRE_InitTrainableVariables(self._server, var_names, tensors, nvars)
+    c_api.PTRE_InitTrainableVariables(self._server, var_names, tensors)

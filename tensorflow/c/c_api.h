@@ -1555,7 +1555,7 @@ TF_CAPI_EXPORT extern void PTRE_ServerStop(PTRE_Server* server);
 TF_CAPI_EXPORT extern bool PTRE_CheckIncoming(PTRE_Server* server);
 TF_CAPI_EXPORT extern void PTRE_InitTrainableVariables(PTRE_Server* server,
                                                        const char** var_names,
-                                                       TF_Tensor** vars,
+                                                       TF_Tensor* const* vars,
                                                        int nvars);
 TF_CAPI_EXPORT extern void PTRE_DeleteServer(PTRE_Server* server);
 
