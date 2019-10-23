@@ -4,6 +4,7 @@
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/platform/mutex.h"
 #include "tensorflow/ptre/rpc/ptre_service_impl.h"
+#include "tensorflow/ptre/cm/remote_store.h"
 
 namespace tensorflow {
 
@@ -24,12 +25,13 @@ class PtreServer {
                               //const std::vector<DataType>& dtypes,
                               //const std::vector<TensorShape>& shapes,
                               int nvars);
+  void LogDebugString(const std::string& name, int max_entries);
   //void NewPtreServer(int rank, std::unique_ptr<PtreServer>* out_server);
   const std::string target() const;
 
  private:
   void GrpcStart();
-
+  RemoteStore remote_store_;
   mutex mu_;
   enum State { DISCONNECTED, CONNECTED };
   PtreServiceImpl* ptre_service_ = nullptr;

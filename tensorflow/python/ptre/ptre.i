@@ -26,6 +26,12 @@ def PTRE_InitTrainableVariables(server, vars):
   PTRE_InitTrainableVariables_wrapper(server, var_names, ndarrays)
 %}
 
+//%unignore tensorflow::PTRE_LogDebugString_wrapper;
+//%insert("python") %{
+//def PTRE_LogDebugString(server, name, max_entries):
+//  PTRE_LogDebugString_wrapper(server, name, max_entries)
+//%}
+
 %include "tensorflow/python/ptre/ptre_helper.h"
 
 %unignoreall

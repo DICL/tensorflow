@@ -34,6 +34,7 @@ cc_library(
     hdrs = ["core/ptre_server.h"],
     deps = [
         ":ptre_service_impl",
+        ":remote_store",
         "//tensorflow/core:framework",
     ]
 )

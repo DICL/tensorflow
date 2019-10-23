@@ -2583,11 +2583,17 @@ void PTRE_InitTrainableVariables(PTRE_Server* server,
     dtypes.emplace_back(static_cast<tensorflow::DataType>(vars[i]->dtype));
     shapes.emplace_back(vars[i]->shape);
     var_tensors.emplace_back(new Tensor());
-    LOG(INFO) << "Calling TF_TensorToTensor" << std::endl;
+    //LOG(INFO) << "Calling TF_TensorToTensor" << std::endl;
     TF_TensorToTensor(vars[i], var_tensors.back());  // tensorflow/c/tf_tensor.cc
   }
   //server->server->InitTrainableVariables(names, dtypes, shapes, nvars);
   server->server->InitTrainableVariables(names, var_tensors, nvars);
+}
+
+void PTRE_LogDebugString(PTRE_Server* server,
+                         const char* name,
+                         int max_entries) {
+  server->server->LogDebugString(name, max_entries);
 }
 
 

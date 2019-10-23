@@ -16,6 +16,10 @@ void PTRE_InitTrainableVariables_wrapper(PTRE_Server* server,
                                          const NameVector& var_names,
                                          PyObject* vars);
 
+//void PTRE_LogDebugString_wrapper(PTRE_Server* server,
+//                                 const char* name,
+//                                 int max_entries);
+
 }  // namespace tensorflow
 
 #endif  // TENSORFLOW_PYTHON_PTRE_PTRE_HELPER_H_

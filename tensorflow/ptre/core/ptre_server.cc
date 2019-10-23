@@ -1,6 +1,7 @@
 #include "tensorflow/ptre/core/ptre_server.h"
 
 #include <string>
+
 #include "tensorflow/ptre/rpc/ptre_service_impl.h"
 
 namespace tensorflow {
@@ -36,6 +37,17 @@ void PtreServer::InitTrainableVariables(const std::vector<std::string>& names,
     LOG(INFO) << var_tensors[i]->dtype() << ", "
               << var_tensors[i]->shape() << std::endl;
   }
+  LOG(INFO) << "Adding tensors to remote store" << std::endl;
+  for (int i = 0; i < nvars; i++) {
+    remote_store_.AddVariable(names[i], var_tensors[i]);
+  }
+}
+
+void PtreServer::LogDebugString(const std::string& name, int max_entries) {
+  LOG(INFO) << name << std::endl
+            << remote_store_.DebugString(name, max_entries) << std::endl;
+}
+
 /*
 void Tensor::CopyFromInternal(const Tensor& other, const TensorShape& shape) {
   CHECK_EQ(shape.num_elements(), other.NumElements());
@@ -65,7 +77,6 @@ Tensor::Tensor(Allocator* a, DataType type, const TensorShape& shape)
   }
 }
 */
-}
 
 const std::string PtreServer::target() const {
   return "grpc://localhost:50051";

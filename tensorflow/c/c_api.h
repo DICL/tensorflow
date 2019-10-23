@@ -1558,6 +1558,9 @@ TF_CAPI_EXPORT extern void PTRE_InitTrainableVariables(PTRE_Server* server,
                                                        TF_Tensor* const* vars,
                                                        int nvars);
 TF_CAPI_EXPORT extern void PTRE_DeleteServer(PTRE_Server* server);
+TF_CAPI_EXPORT extern void PTRE_LogDebugString(PTRE_Server* server,
+                                               const char* name,
+                                               int max_entries);
 
 // Register a listener method that processes printed messages.
 //

@@ -27,4 +27,10 @@ void PTRE_InitTrainableVariables_wrapper(PTRE_Server* server,
                               var_names.size());
 }
 
+//void PTRE_LogDebugString_wrapper(PTRE_Server* server,
+//                                 const char* name,
+//                                 int max_entries) {
+//  server->server->LogDebugString(name, max_entries);
+//}
+
 }  // namespace tensorflow

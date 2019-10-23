@@ -1,5 +1,9 @@
 #include "tensorflow/ptre/cm/remote_store.h"
-//#include "tensorflow/core/framework/tensor.h"
+
+#include <string>
+
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/framework/tensor_util.h"
 
 namespace tensorflow {
 
@@ -9,16 +13,33 @@ static Allocator* get_default_cpu_allocator() {
   return default_cpu_allocator;
 }
 
-RemoteStore::RemoteStore(const Tensor& other) {
-  tensor_ = new Tensor(get_default_cpu_allocator(),
-                       other.dtype(),
-                       other.shape());
+//RemoteStore::RemoteStore(const Tensor& other) {
+//  tensor_ = new Tensor(get_default_cpu_allocator(),
+//                       other.dtype(),
+//                       other.shape());
+//}
+
+RemoteStore::RemoteStore() {
 }
 
 RemoteStore::~RemoteStore() {
-  delete tensor_;
+  //delete tensor_;
 }
 
+void RemoteStore::AddVariable(const std::string& name, const Tensor* in) {
+  //TODO: manage memory leak
+  Tensor* var = new Tensor(tensor::DeepCopy(*in));
+  vars_.push_back(var);
+  name_to_var_.emplace(name, var);
+  LOG(INFO) << "RemoteStore registered a new tensor: " << name << std::endl
+            << var->dtype() << ", "
+            << var->shape() << std::endl;
+}
+
+string RemoteStore::DebugString(const std::string& name, int max_entries) {
+  auto t = name_to_var_[name];
+  return t->DebugString(max_entries);
+}
 //void RemoteStore::Write(const Tensor& other) {
 //  CHECK_EQ(tensor_->shape(), other.shape());
 //  TensorBuffer* buf = tensor_->buf_;
