@@ -14,7 +14,8 @@ typedef gtl::InlinedVector<TF_Tensor*, 8> TF_TensorVector;
 
 void PTRE_InitTrainableVariables_wrapper(PTRE_Server* server,
                                          const NameVector& var_names,
-                                         PyObject* vars);
+                                         PyObject* ndarrs_t,
+                                         PyObject* ndarrs_c);
 
 //void PTRE_LogDebugString_wrapper(PTRE_Server* server,
 //                                 const char* name,

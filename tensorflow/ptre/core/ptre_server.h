@@ -20,18 +20,23 @@ class PtreServer {
 
   bool CheckIncoming();
   void InitTrainableVariables(const std::vector<std::string>& names,
-                              const std::vector<Tensor*>& var_tensors,
+                              //const std::vector<Tensor*>& var_tensors,
+                              const std::vector<Tensor*>& tvars,
+                              const std::vector<Tensor*>& cvars,
                               //TF_Tensor* const* vars,
                               //const std::vector<DataType>& dtypes,
                               //const std::vector<TensorShape>& shapes,
                               int nvars);
   void LogDebugString(const std::string& name, int max_entries);
+  Tensor* CmTensor(const std::string& name);
+  //void CM_AverageVariable(const Tensor* other);
   //void NewPtreServer(int rank, std::unique_ptr<PtreServer>* out_server);
   const std::string target() const;
 
  private:
   void GrpcStart();
   RemoteStore remote_store_;
+  RemoteStore trainer_store_;
   mutex mu_;
   enum State { DISCONNECTED, CONNECTED };
   PtreServiceImpl* ptre_service_ = nullptr;

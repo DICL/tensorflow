@@ -26,14 +26,29 @@ RemoteStore::~RemoteStore() {
   //delete tensor_;
 }
 
-void RemoteStore::AddVariable(const std::string& name, const Tensor* in) {
+void RemoteStore::AddVariable(const std::string& name, Tensor* var) {
   //TODO: manage memory leak
-  Tensor* var = new Tensor(tensor::DeepCopy(*in));
+  //Tensor* var = new Tensor(tensor::DeepCopy(*in));
+  //Tensor* var = new Tensor(*in);
   vars_.push_back(var);
   name_to_var_.emplace(name, var);
-  LOG(INFO) << "RemoteStore registered a new tensor: " << name << std::endl
+  LOG(INFO) << "Registered a new tensor: " << name << std::endl
             << var->dtype() << ", "
             << var->shape() << std::endl;
+}
+
+//void RemoteStore::AverageVariableCpu(const std::string& name,
+//                                     const Tensor* other) {
+//  Tensor* var = name_to_var_[name];
+//  AverageVariableCpu(var, other);
+//}
+//
+//void RemoteStore::AverageVariableCpu(Tensor* target, const Tensor* other) {
+//  for(
+//}
+
+Tensor* RemoteStore::tensor(const std::string& name) {
+  return name_to_var_[name];
 }
 
 string RemoteStore::DebugString(const std::string& name, int max_entries) {

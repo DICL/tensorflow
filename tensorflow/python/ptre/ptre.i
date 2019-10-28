@@ -19,11 +19,20 @@
 
 %unignore tensorflow::PTRE_InitTrainableVariables_wrapper;
 %insert("python") %{
-def PTRE_InitTrainableVariables(server, vars):
+def PTRE_InitTrainableVariables(server, tvars, cvars):
+  """
+  Args:
+    server: PTRE_Server.
+    tvars: List of tensorflow.python.ops.resource_variable_ops.ResourceVariable
+           representing trainable variables of Worker.
+    cvars: List of tensorflow.python.ops.resource_variable_ops.ResourceVariable
+           for ConsensusManager.
+  """
   print("python api PTRE_InitTrainableVariables")
-  var_names = [ v.name for v in vars ]
-  ndarrays = [ v.numpy() for v in vars ]
-  PTRE_InitTrainableVariables_wrapper(server, var_names, ndarrays)
+  names = [ v.name for v in tvars ]
+  ndarrs_t = [ v.value()._numpy() for v in tvars ]
+  ndarrs_c = [ v.value()._numpy() for v in cvars ]
+  PTRE_InitTrainableVariables_wrapper(server, names, ndarrs_t, ndarrs_c)
 %}
 
 //%unignore tensorflow::PTRE_LogDebugString_wrapper;

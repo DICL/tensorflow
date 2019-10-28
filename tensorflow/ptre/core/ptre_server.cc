@@ -29,22 +29,25 @@ bool PtreServer::CheckIncoming() {
 }
 
 void PtreServer::InitTrainableVariables(const std::vector<std::string>& names,
-                                        const std::vector<Tensor*>& var_tensors,
+                                        const std::vector<Tensor*>& tvars,
+                                        const std::vector<Tensor*>& cvars,
                                         int nvars) {
   LOG(INFO) << "PtreServer got " << nvars << " tensors:" << std::endl;
-  for (int i = 0; i < nvars; i++) {
-    LOG(INFO) << i << ": " << names[i] << std::endl;
-    LOG(INFO) << var_tensors[i]->dtype() << ", "
-              << var_tensors[i]->shape() << std::endl;
-  }
   LOG(INFO) << "Adding tensors to remote store" << std::endl;
   for (int i = 0; i < nvars; i++) {
-    remote_store_.AddVariable(names[i], var_tensors[i]);
+    remote_store_.AddVariable(names[i], cvars[i]);
+    trainer_store_.AddVariable(names[i], tvars[i]);
   }
 }
 
+Tensor* PtreServer::CmTensor(const std::string& name) {
+  return remote_store_.tensor(name);
+}
+
 void PtreServer::LogDebugString(const std::string& name, int max_entries) {
-  LOG(INFO) << name << std::endl
+  LOG(INFO) << "tvar: " << name << std::endl
+            << trainer_store_.DebugString(name, max_entries) << std::endl;
+  LOG(INFO) << "cvar: " << name << std::endl
             << remote_store_.DebugString(name, max_entries) << std::endl;
 }
 

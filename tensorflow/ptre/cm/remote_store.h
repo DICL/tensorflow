@@ -18,7 +18,10 @@ class RemoteStore {
  public:
   RemoteStore();
   ~RemoteStore();
-  void AddVariable(const std::string& name, const Tensor* in);
+  void AddVariable(const std::string& name, Tensor* var);
+  //void AverageVariableCpu(const std::string& name, const Tensor* other);
+  //void AverageVariableCpu(Tensor* target, const Tensor* other);
+  Tensor* tensor(const std::string& name);
   //void Write(const Tensor& tensor);
   //void Read(Tensor& tensor);
   string DebugString(const std::string& name, int max_entries);  // For debugging

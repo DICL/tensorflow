@@ -2571,23 +2571,34 @@ bool PTRE_CheckIncoming(PTRE_Server* server) {
 
 void PTRE_InitTrainableVariables(PTRE_Server* server,
                                  const char** var_names,
-                                 TF_Tensor* const* vars,
+                                 TF_Tensor* const* tf_tvars,
+                                 TF_Tensor* const* tf_cvars,
                                  int nvars) {
   std::vector<std::string> names;
   std::vector<tensorflow::DataType> dtypes;
   std::vector<tensorflow::TensorShape> shapes;
   //TODO: Manage memory leak
-  std::vector<Tensor*> var_tensors;
+  std::vector<Tensor*> tvars;
+  std::vector<Tensor*> cvars;
   for (int i = 0; i < nvars; i++) {
     names.emplace_back(std::string(var_names[i]));
-    dtypes.emplace_back(static_cast<tensorflow::DataType>(vars[i]->dtype));
-    shapes.emplace_back(vars[i]->shape);
-    var_tensors.emplace_back(new Tensor());
+    dtypes.emplace_back(static_cast<tensorflow::DataType>(tf_tvars[i]->dtype));
+    shapes.emplace_back(tf_tvars[i]->shape);
+    tvars.emplace_back(new Tensor());
+    cvars.emplace_back(new Tensor());
     //LOG(INFO) << "Calling TF_TensorToTensor" << std::endl;
-    TF_TensorToTensor(vars[i], var_tensors.back());  // tensorflow/c/tf_tensor.cc
+    TF_TensorToTensor(tf_tvars[i], tvars.back());  // tensorflow/c/tf_tensor.cc
+    TF_TensorToTensor(tf_cvars[i], cvars.back());  // tensorflow/c/tf_tensor.cc
   }
   //server->server->InitTrainableVariables(names, dtypes, shapes, nvars);
-  server->server->InitTrainableVariables(names, var_tensors, nvars);
+  server->server->InitTrainableVariables(names, tvars, cvars, nvars);
+}
+
+void PTRE_CmTensor(PTRE_Server* server, const char* name, TF_Tensor* out) {
+  TF_Status* status = TF_NewStatus();
+  Tensor* cm_tensor = server->server->CmTensor(name);
+  LOG(INFO) << "DEBUG: Calling TF_TensorFromTensor)" << std::endl;
+  out = TF_TensorFromTensor(*cm_tensor, status);
 }
 
 void PTRE_LogDebugString(PTRE_Server* server,

@@ -7,6 +7,7 @@ from tensorflow.python.ptre.cm_ops import _check_incoming
 #from tensorflow.python.training import optimizer
 from tensorflow.python.keras.optimizer_v2 import optimizer_v2
 from tensorflow.python.util.tf_export import tf_export
+from tensorflow.python.ops.variables import Variable
 
 def check_incoming():
   return _check_incoming()
@@ -24,6 +25,17 @@ class ModelAverageOptimizer(optimizer_v2.OptimizerV2):
         communication_period)
     self._opt = opt
     self._period = communication_period
+    self._cm_variables = None
+    self._cm_variables_table = None
+
+  def init_cm_variables(self, trainable_variables):
+    self._cm_variables = []
+    self._cm_variables_table = {}
+    for v in trainable_variables:
+      cv = Variable(v, trainable=False)
+      self._cm_variables.append(cv)
+      self._cm_variables_table[v.name] = cv
+    #self._cm_variables = [ Variable(v, trainable=False) for v in trainable_variables ]
 
   def get_config(self):
     return self._opt.get_config()
