@@ -60,4 +60,4 @@ limitations under the License.
 
 %include "tensorflow/python/util/traceme.i"
 
-%include "tensorflow/python/ptre/ptre.i"
+/*%include "tensorflow/python/ptre/ptre.i"*/

@@ -5583,6 +5583,19 @@ tf_cc_test(
     ],
 )
 
+#tf_kernel_library(
+#    name = "ptre_ops",
+#    prefix = "ptre_ops",
+#    deps = [
+#        ":bounds_check",
+#        ":training_op_helpers",
+#        ":variable_ops",
+#        "//tensorflow/core:framework",
+#        "//tensorflow/core:lib",
+#        "//third_party/eigen3",
+#    ],
+#)
+
 tf_kernel_library(
     name = "multinomial_op",
     prefix = "multinomial_op",
@@ -6189,6 +6202,7 @@ filegroup(
         "topk_op.h",
         "training_op_helpers.h",
         "training_ops.h",
+        #"ptre_ops.h",
         "transpose_functor.h",
         "transpose_op.h",
         "where_op.h",
@@ -6408,6 +6422,7 @@ filegroup(
         "topk_op.cc",
         "training_op_helpers.cc",
         "training_ops.cc",
+        #"ptre_ops.cc",
         "transpose_functor_cpu.cc",
         "transpose_op.cc",
         "unique_op.cc",

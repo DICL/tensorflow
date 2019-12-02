@@ -23,6 +23,13 @@ limitations under the License.
 namespace tensorflow {
 namespace functor {
 
+template <typename Device, typename T>
+struct ApplyModelAverage {
+  void operator()(const Device& d, typename TTypes<T>::Flat var,
+                  //typename TTypes<T>::ConstScalar alpha,
+                  typename TTypes<T>::ConstFlat other);
+};
+
 // Each training algorithm has a ApplyXYZ functor struct declared in
 // this header file. They are specialized for different devices
 // (CPUDevice in training_ops.cc or GPUDevice in training_ops_gpu.cc).

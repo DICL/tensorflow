@@ -137,7 +137,7 @@ py_library(
         ":ops",
         ":platform",
         ":proto_ops",
-        ":ptre",
+        #":ptre",
         ":pywrap_tensorflow",
         ":rnn_ops_gen",
         ":saver_test_utils",
@@ -2237,6 +2237,11 @@ tf_gen_op_wrapper_private_py(
     out = "training/gen_training_ops.py",
 )
 
+#tf_gen_op_wrapper_private_py(
+#    name = "ptre_ops_gen",
+#    out = "ptre/gen_ptre_ops.py",
+#)
+
 tf_gen_op_wrapper_private_py(
     name = "ragged_array_ops_gen",
     visibility = [
@@ -4292,17 +4297,17 @@ cuda_py_test(
     xla_enable_strict_auto_jit = True,
 )
 
-py_library(
-    name = "ptre",
-    srcs = [
-        "ptre/ptre.py",
-        "ptre/optimizer.py",
-        "ptre/cm_ops.py",
-        "ptre/server_lib.py",
-        "ptre/callbacks.py",
-    ],
-    srcs_version = "PY2AND3",
-)
+#py_library(
+#    name = "ptre",
+#    srcs = [
+#        "ptre/ptre.py",
+#        "ptre/optimizer.py",
+#        "ptre/cm_ops.py",
+#        "ptre/server_lib.py",
+#        "ptre/callbacks.py",
+#    ],
+#    srcs_version = "PY2AND3",
+#)
 
 py_library(
     name = "training_lib",
@@ -4363,6 +4368,7 @@ py_library(
         ":state_ops",
         ":summary",
         ":training_ops_gen",
+        #":ptre_ops_gen",
         ":training_util",
         ":util",
         ":variable_scope",
@@ -4852,17 +4858,17 @@ tf_cuda_library(
     ],
 )
 
-tf_cuda_library(
-    name = "ptre_helper",
-    srcs = ["ptre/ptre_helper.cc"],
-    hdrs = ["ptre/ptre_helper.h"],
-    deps = [
-        ":ndarray_tensor",
-        "//tensorflow/c:c_api",
-        "//tensorflow/c:tf_tensor",
-        "//third_party/python_runtime:headers",
-    ],
-)
+#tf_cuda_library(
+#    name = "ptre_helper",
+#    srcs = ["ptre/ptre_helper.cc"],
+#    hdrs = ["ptre/ptre_helper.h"],
+#    deps = [
+#        ":ndarray_tensor",
+#        "//tensorflow/c:c_api",
+#        "//tensorflow/c:tf_tensor",
+#        "//third_party/python_runtime:headers",
+#    ],
+#)
 
 py_library(
     name = "pywrap_tensorflow",
@@ -4913,7 +4919,7 @@ tf_py_wrap_cc(
         "util/transform_graph.i",
         "util/util.i",
         "//tensorflow/lite/toco/python:toco.i",
-        "ptre/ptre.i",
+        #"ptre/ptre.i",
     ],
     # add win_def_file for pywrap_tensorflow
     win_def_file = select({
@@ -4935,7 +4941,7 @@ tf_py_wrap_cc(
         ":py_record_writer_lib",
         ":python_op_gen",
         ":tf_session_helper",
-        ":ptre_helper",
+        #":ptre_helper",
         "//third_party/python_runtime:headers",
         "//tensorflow/c:c_api",
         "//tensorflow/c:c_api_experimental",
