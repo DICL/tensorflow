@@ -56,6 +56,34 @@ static Status HandleGradAndIndicesInputs(InferenceContext* c, bool sparse,
   return Status::OK();
 }
 
+static Status ApplyModelAverageShapeFn(InferenceContext* c) {
+  ShapeHandle unused;
+  ShapeHandle s = ShapeOrHandleShape(c, 0);                  // var
+  //TF_RETURN_IF_ERROR(c->WithRank(c->input(1), 0, &unused));  // alpha
+  TF_RETURN_IF_ERROR(c->Merge(s, c->input(1), &s));          // remote
+  if (c->num_outputs() > 0) {
+    c->set_output(0, s);
+  }
+  return Status::OK();
+}
+
+REGISTER_OP("ApplyModelAverage")
+    .Input("var: Ref(T)")
+    //.Input("alpha: T")
+    .Input("remote: T")
+    .Output("out: Ref(T)")
+    .Attr("T: numbertype")
+    .Attr("use_locking: bool = false")
+    .SetShapeFn(ApplyModelAverageShapeFn);
+
+REGISTER_OP("ResourceApplyModelAverage")
+    .Input("var: resource")
+    //.Input("alpha: T")
+    .Input("remote: T")
+    .Attr("T: numbertype")
+    .Attr("use_locking: bool = false")
+    .SetShapeFn(ApplyModelAverageShapeFn);
+
 static Status ApplyGradientDescentShapeFn(InferenceContext* c) {
   ShapeHandle unused;
   ShapeHandle s = ShapeOrHandleShape(c, 0);                  // var

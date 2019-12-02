@@ -47,6 +47,15 @@ inline T sgn(const T x) {
 
 namespace functor {
 template <typename T>
+struct ApplyModelAverage<CPUDevice, T> {
+  void operator()(const CPUDevice& d, typename TTypes<T>::Flat var,
+                  //typename TTypes<T>::ConstScalar alpha,
+                  typename TTypes<T>::ConstFlat other) {
+    var.device(d) = (var.constant(T(0.5)) * var + var.constant(T(0.5)) * other);
+  }
+};
+
+template <typename T>
 struct ApplyGradientDescent<CPUDevice, T> {
   void operator()(const CPUDevice& d, typename TTypes<T>::Flat var,
                   typename TTypes<T>::ConstScalar lr,
@@ -515,6 +524,68 @@ struct ApplyPowerSign<CPUDevice, T> {
 };
 
 }  // namespace functor
+
+template <typename Device, typename T>
+class ApplyModelAverageOp : public OpKernel {
+ public:
+  explicit ApplyModelAverageOp(OpKernelConstruction* ctx) : OpKernel(ctx) {
+    OP_REQUIRES_OK(ctx, ctx->GetAttr("use_locking", &use_exclusive_lock_));
+  }
+
+  void Compute(OpKernelContext* ctx) override {
+    const bool sparse = false;
+    auto locks = MaybeLockVariableInputMutexesInOrder<Device, T>(
+        ctx, use_exclusive_lock_, sparse, {0});
+    Tensor var;
+    OP_REQUIRES_OK(ctx, GetInputTensorFromVariable<Device, T>(
+                            ctx, 0, use_exclusive_lock_, sparse, &var));
+
+    OP_REQUIRES(
+        ctx, var.IsInitialized(),
+        errors::FailedPrecondition(
+            "Attempting to use uninitialized variables: ", requested_input(0)));
+    //const Tensor& alpha = ctx->input(1);
+    //OP_REQUIRES(ctx, IsLegacyScalar(alpha.shape()),
+    //            errors::InvalidArgument("alpha is not a scalar: ",
+    //                                    alpha.shape().DebugString()));
+    const Tensor& remote = ctx->input(1);
+    OP_REQUIRES(
+        ctx, var.shape().IsSameSize(remote.shape()),
+        errors::InvalidArgument("var and remote do not have the same shape",
+                                var.shape().DebugString(), " ",
+                                remote.shape().DebugString()));
+
+    const Device& device = ctx->template eigen_device<Device>();
+    functor::ApplyModelAverage<Device, T>()(
+        device, var.flat<T>(),
+        //alpha.scalar<T>(),
+        remote.flat<T>());
+
+    MaybeForwardRefInputToRefOutput(ctx, 0, 0);
+  }
+
+ private:
+  bool use_exclusive_lock_;
+};
+
+#define REGISTER_KERNELS(D, T)                                                \
+  REGISTER_KERNEL_BUILDER(                                                    \
+      Name("ApplyModelAverage").Device(DEVICE_##D).TypeConstraint<T>("T"), \
+      ApplyModelAverageOp<D##Device, T>);                                  \
+  REGISTER_KERNEL_BUILDER(Name("ResourceApplyModelAverage")                \
+                              .Device(DEVICE_##D)                             \
+                              .HostMemory("var")                              \
+                              .TypeConstraint<T>("T"),                        \
+                          ApplyModelAverageOp<D##Device, T>);
+#define REGISTER_CPU_KERNELS(T) REGISTER_KERNELS(CPU, T);
+
+TF_CALL_half(REGISTER_CPU_KERNELS);
+TF_CALL_bfloat16(REGISTER_CPU_KERNELS);
+TF_CALL_float(REGISTER_CPU_KERNELS);
+TF_CALL_double(REGISTER_CPU_KERNELS);
+
+#undef REGISTER_CPU_KERNELS
+#undef REGISTER_KERNELS
 
 template <typename Device, typename T>
 class ApplyGradientDescentOp : public OpKernel {
