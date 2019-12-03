@@ -26,6 +26,20 @@ typedef Eigen::GpuDevice GPUDevice;
 
 namespace functor {
 template <typename T>
+struct ApplyModelAverage<GPUDevice, T> {
+  void operator()(const GPUDevice& d, typename TTypes<T>::Flat var,
+                  //typename TTypes<T>::ConstScalar lr,
+                  typename TTypes<T>::ConstFlat other) {
+    var.device(d) = (var.constant(T(0.5)) * var + var.constant(T(0.5)) * other);
+
+    //Eigen::array<typename TTypes<T>::Tensor::Index, 1> bcast;
+    //bcast[0] = grad.dimension(0);
+    //Eigen::Sizes<1> single;
+    //var.device(d) -= lr.reshape(single).broadcast(bcast) * grad;
+  }
+};
+
+template <typename T>
 struct ApplyGradientDescent<GPUDevice, T> {
   void operator()(const GPUDevice& d, typename TTypes<T>::Flat var,
                   typename TTypes<T>::ConstScalar lr,
@@ -434,6 +448,10 @@ struct ApplyPowerSign<GPUDevice, T> {
 };
 
 }  // namespace functor
+
+template struct functor::ApplyModelAverage<GPUDevice, Eigen::half>;
+template struct functor::ApplyModelAverage<GPUDevice, float>;
+template struct functor::ApplyModelAverage<GPUDevice, double>;
 
 template struct functor::ApplyGradientDescent<GPUDevice, Eigen::half>;
 template struct functor::ApplyGradientDescent<GPUDevice, float>;

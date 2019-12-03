@@ -584,6 +584,26 @@ TF_CALL_bfloat16(REGISTER_CPU_KERNELS);
 TF_CALL_float(REGISTER_CPU_KERNELS);
 TF_CALL_double(REGISTER_CPU_KERNELS);
 
+#if GOOGLE_CUDA || TENSORFLOW_USE_ROCM
+// Forward declarations of the functor specializations for GPU.
+namespace functor {
+#define DECLARE_GPU_SPEC(T)                             \
+  template <>                                           \
+  void ApplyModelAverage<GPUDevice, T>::operator()(  \
+      const GPUDevice& d, typename TTypes<T>::Flat var, \
+      typename TTypes<T>::ConstFlat other);             \
+  extern template struct ApplyModelAverage<GPUDevice, T>;
+DECLARE_GPU_SPEC(Eigen::half);
+DECLARE_GPU_SPEC(float);
+DECLARE_GPU_SPEC(double);
+#undef DECLARE_GPU_SPEC
+}  // namespace functor
+
+REGISTER_KERNELS(GPU, Eigen::half);
+REGISTER_KERNELS(GPU, float);
+REGISTER_KERNELS(GPU, double);
+#endif
+
 #undef REGISTER_CPU_KERNELS
 #undef REGISTER_KERNELS
 
