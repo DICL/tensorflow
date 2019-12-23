@@ -40,6 +40,20 @@ struct ApplyModelAverage<GPUDevice, T> {
 };
 
 template <typename T>
+struct ApplyGradientDescentModelaverage<GPUDevice, T> {
+  void operator()(const GPUDevice& d, typename TTypes<T>::Flat var,
+                  typename TTypes<T>::ConstScalar lr,
+                  typename TTypes<T>::ConstFlat grad,
+                  typename TTypes<T>::ConstFlat other) {
+    Eigen::array<typename TTypes<T>::Tensor::Index, 1> bcast;
+    bcast[0] = grad.dimension(0);
+    Eigen::Sizes<1> single;
+    var.device(d) -= lr.reshape(single).broadcast(bcast) * grad;
+    var.device(d) = var.constant(T(0.5)) * (var + other);
+  }
+};
+
+template <typename T>
 struct ApplyGradientDescent<GPUDevice, T> {
   void operator()(const GPUDevice& d, typename TTypes<T>::Flat var,
                   typename TTypes<T>::ConstScalar lr,

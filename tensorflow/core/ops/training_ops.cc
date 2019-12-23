@@ -112,6 +112,25 @@ REGISTER_OP("ResourceApplyGradientDescent")
     .Attr("use_locking: bool = false")
     .SetShapeFn(ApplyGradientDescentShapeFn);
 
+REGISTER_OP("ApplyGradientDescentModelaverage")
+    .Input("var: Ref(T)")
+    .Input("alpha: T")
+    .Input("delta: T")
+    .Input("other: T")
+    .Output("out: Ref(T)")
+    .Attr("T: numbertype")
+    .Attr("use_locking: bool = false")
+    .SetShapeFn(ApplyGradientDescentShapeFn);
+
+REGISTER_OP("ResourceApplyGradientDescentModelaverage")
+    .Input("var: resource")
+    .Input("alpha: T")
+    .Input("delta: T")
+    .Input("other: T")
+    .Attr("T: numbertype")
+    .Attr("use_locking: bool = false")
+    .SetShapeFn(ApplyGradientDescentShapeFn);
+
 static Status ApplyProximalGradientDescentShapeFn(InferenceContext* c,
                                                   bool sparse) {
   ShapeHandle unused;

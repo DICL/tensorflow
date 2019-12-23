@@ -56,6 +56,17 @@ struct ApplyModelAverage<CPUDevice, T> {
 };
 
 template <typename T>
+struct ApplyGradientDescentModelaverage<CPUDevice, T> {
+  void operator()(const CPUDevice& d, typename TTypes<T>::Flat var,
+                  typename TTypes<T>::ConstScalar lr,
+                  typename TTypes<T>::ConstFlat grad,
+                  typename TTypes<T>::ConstFlat other) {
+    var.device(d) -= grad * lr();
+    var.device(d) = var.constant(T(0.5)) * (var + other);
+  }
+};
+
+template <typename T>
 struct ApplyGradientDescent<CPUDevice, T> {
   void operator()(const CPUDevice& d, typename TTypes<T>::Flat var,
                   typename TTypes<T>::ConstScalar lr,
@@ -607,6 +618,94 @@ REGISTER_KERNELS(GPU, double);
 #undef REGISTER_CPU_KERNELS
 #undef REGISTER_KERNELS
 
+template <typename Device, typename T>
+class ApplyGradientDescentModelaverageOp : public OpKernel {
+ public:
+  explicit ApplyGradientDescentModelaverageOp(OpKernelConstruction* ctx) : OpKernel(ctx) {
+    OP_REQUIRES_OK(ctx, ctx->GetAttr("use_locking", &use_exclusive_lock_));
+  }
+
+  void Compute(OpKernelContext* ctx) override {
+    const bool sparse = false;
+    auto locks = MaybeLockVariableInputMutexesInOrder<Device, T>(
+        ctx, use_exclusive_lock_, sparse, {0});
+    Tensor var;
+    OP_REQUIRES_OK(ctx, GetInputTensorFromVariable<Device, T>(
+                            ctx, 0, use_exclusive_lock_, sparse, &var));
+
+    OP_REQUIRES(
+        ctx, var.IsInitialized(),
+        errors::FailedPrecondition(
+            "Attempting to use uninitialized variables: ", requested_input(0)));
+    const Tensor& alpha = ctx->input(1);
+    OP_REQUIRES(ctx, IsLegacyScalar(alpha.shape()),
+                errors::InvalidArgument("alpha is not a scalar: ",
+                                        alpha.shape().DebugString()));
+    const Tensor& delta = ctx->input(2);
+    OP_REQUIRES(
+        ctx, var.shape().IsSameSize(delta.shape()),
+        errors::InvalidArgument("var and delta do not have the same shape",
+                                var.shape().DebugString(), " ",
+                                delta.shape().DebugString()));
+    const Tensor& other = ctx->input(1);
+    OP_REQUIRES(
+        ctx, var.shape().IsSameSize(other.shape()),
+        errors::InvalidArgument("var and other do not have the same shape",
+                                var.shape().DebugString(), " ",
+                                other.shape().DebugString()));
+
+    const Device& device = ctx->template eigen_device<Device>();
+    functor::ApplyGradientDescentModelaverage<Device, T>()(
+        device, var.flat<T>(), alpha.scalar<T>(), delta.flat<T>(),
+        other.flat<T>());
+
+    MaybeForwardRefInputToRefOutput(ctx, 0, 0);
+  }
+
+ private:
+  bool use_exclusive_lock_;
+};
+
+#define REGISTER_KERNELS(D, T)                                                \
+  REGISTER_KERNEL_BUILDER(                                                    \
+      Name("ApplyGradientDescentModelaverage").Device(DEVICE_##D).TypeConstraint<T>("T"), \
+      ApplyGradientDescentModelaverageOp<D##Device, T>);                                  \
+  REGISTER_KERNEL_BUILDER(Name("ResourceApplyGradientDescentModelaverage")                \
+                              .Device(DEVICE_##D)                             \
+                              .HostMemory("var")                              \
+                              .TypeConstraint<T>("T"),                        \
+                          ApplyGradientDescentModelaverageOp<D##Device, T>);
+#define REGISTER_CPU_KERNELS(T) REGISTER_KERNELS(CPU, T);
+
+TF_CALL_half(REGISTER_CPU_KERNELS);
+TF_CALL_bfloat16(REGISTER_CPU_KERNELS);
+TF_CALL_float(REGISTER_CPU_KERNELS);
+TF_CALL_double(REGISTER_CPU_KERNELS);
+
+#if GOOGLE_CUDA || TENSORFLOW_USE_ROCM
+// Forward declarations of the functor specializations for GPU.
+namespace functor {
+#define DECLARE_GPU_SPEC(T)                             \
+  template <>                                           \
+  void ApplyGradientDescentModelaverage<GPUDevice, T>::operator()(  \
+      const GPUDevice& d, typename TTypes<T>::Flat var, \
+      typename TTypes<T>::ConstScalar alpha,            \
+      typename TTypes<T>::ConstFlat delta,             \
+      typename TTypes<T>::ConstFlat other);             \
+  extern template struct ApplyGradientDescentModelaverage<GPUDevice, T>;
+DECLARE_GPU_SPEC(Eigen::half);
+DECLARE_GPU_SPEC(float);
+DECLARE_GPU_SPEC(double);
+#undef DECLARE_GPU_SPEC
+}  // namespace functor
+
+REGISTER_KERNELS(GPU, Eigen::half);
+REGISTER_KERNELS(GPU, float);
+REGISTER_KERNELS(GPU, double);
+#endif
+
+#undef REGISTER_CPU_KERNELS
+#undef REGISTER_KERNELS
 template <typename Device, typename T>
 class ApplyGradientDescentOp : public OpKernel {
  public:

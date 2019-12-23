@@ -30,6 +30,14 @@ struct ApplyModelAverage {
                   typename TTypes<T>::ConstFlat other);
 };
 
+template <typename Device, typename T>
+struct ApplyGradientDescentModelaverage {
+  void operator()(const Device& d, typename TTypes<T>::Flat var,
+                  typename TTypes<T>::ConstScalar alpha,
+                  typename TTypes<T>::ConstFlat delta,
+                  typename TTypes<T>::ConstFlat other);
+};
+
 // Each training algorithm has a ApplyXYZ functor struct declared in
 // this header file. They are specialized for different devices
 // (CPUDevice in training_ops.cc or GPUDevice in training_ops_gpu.cc).
